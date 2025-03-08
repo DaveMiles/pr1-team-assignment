@@ -31,7 +31,6 @@ public class Player extends Character {
     protected int width;
 
     public Player() {
-        System.out.println("Player created");
         loadPlayerFrames();
         image = getImage();
         width = image.getWidth();
@@ -47,7 +46,7 @@ public class Player extends Character {
 
     private void loadIdleFrames() {
         idleFrames = new GreenfootImage[7];
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < idleFrames.length; i++) {
             idleFrames[i] = new GreenfootImage("IDLE-" + i + ".png");
             if (!isFacingRight) {
                 idleFrames[i].mirrorHorizontally();
@@ -77,12 +76,13 @@ public class Player extends Character {
 
     private void loadJumpFrames() {
         jumpFrames = new GreenfootImage[5];
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < jumpFrames.length; i++) {
             jumpFrames[i] = new GreenfootImage("JUMP-" + i + ".png");
             if (!isFacingRight) {
                 jumpFrames[i].mirrorHorizontally();
             }
         }
+
     }
 
     /**
@@ -90,7 +90,7 @@ public class Player extends Character {
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
     public void act() {
-        if (!isJumping && !isAttacking) {
+        if (!isInAction()) {
             GreenfootImage[] currentFrames = isMoving() ? runFrames : idleFrames;
             if (frameDelay >= delayCount) {
                 setImage(currentFrames[currentFrame]);
@@ -107,6 +107,10 @@ public class Player extends Character {
 
     private boolean isMoving() {
         return (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("right"));
+    }
+
+    private boolean isInAction() {
+        return isJumping && isAttacking;
     }
 
     private void inputAction() {
@@ -151,8 +155,8 @@ public class Player extends Character {
 
     private void attack() {
         isAttacking = true;
-        for (int i = 0; i < attackFrames.length; i++) {
-            setImage(attackFrames[i]);
+        for (GreenfootImage frame : attackFrames) {
+            setImage(frame);
             Greenfoot.delay(5);
         }
         isAttacking = false;
@@ -169,7 +173,6 @@ public class Player extends Character {
 
             // Check if the player has landed
             if (getY() >= getWorld().getHeight() - height / 2) {
-                setLocation(getX(), getWorld().getHeight() - height / 2);
                 isJumping = false;
                 verticalSpeed = 0;
             }
