@@ -12,9 +12,11 @@ public class Player extends Character {
     private GreenfootImage[] jumpFrames;
     private GreenfootImage[] runFrames;
     private GreenfootImage[] attackFrames;
+    private GreenfootImage[] deathFrames;
     private int currentFrame = 0;
     private int frameDelay = 0;
     private int delayCount = 10;
+    protected boolean isFacingRight = true;
 
     // movement properties
     protected int speed = 2;
@@ -23,18 +25,24 @@ public class Player extends Character {
     protected int verticalSpeed = 0;
     protected boolean isJumping = false;
     protected boolean isAttacking = false;
-    protected boolean isFacingRight = true;
 
     // image properties
     protected GreenfootImage image;
     protected int height;
     protected int width;
 
+    // roleplay properties
+    protected int health = 100;
+    protected int damage = 50;
+    protected int weaponReach;
+
     public Player() {
         loadPlayerFrames();
-        image = getImage();
+        image = new GreenfootImage("PLAYER-IDLE-0.png");
+        setImage(image);
         width = image.getWidth();
         height = image.getHeight();
+        weaponReach = width / 2;
     }
 
     private void loadPlayerFrames() {
@@ -42,12 +50,13 @@ public class Player extends Character {
         loadIdleFrames();
         loadJumpFrames();
         loadAttackingFrames();
+        loadDeathFrames();
     }
 
     private void loadIdleFrames() {
         idleFrames = new GreenfootImage[7];
         for (int i = 0; i < idleFrames.length; i++) {
-            idleFrames[i] = new GreenfootImage("IDLE-" + i + ".png");
+            idleFrames[i] = new GreenfootImage("PLAYER-IDLE-" + i + ".png");
             if (!isFacingRight) {
                 idleFrames[i].mirrorHorizontally();
             }
@@ -57,7 +66,7 @@ public class Player extends Character {
     private void loadRunningFrames() {
         runFrames = new GreenfootImage[7];
         for (int i = 0; i < runFrames.length; i++) {
-            runFrames[i] = new GreenfootImage("RUN-" + i + ".png");
+            runFrames[i] = new GreenfootImage("PLAYER-RUN-" + i + ".png");
             if (!isFacingRight) {
                 runFrames[i].mirrorHorizontally();
             }
@@ -67,7 +76,7 @@ public class Player extends Character {
     private void loadAttackingFrames() {
         attackFrames = new GreenfootImage[6];
         for (int i = 0; i < attackFrames.length; i++) {
-            attackFrames[i] = new GreenfootImage("ATTACK-" + i + ".png");
+            attackFrames[i] = new GreenfootImage("PLAYER-ATTACK-" + i + ".png");
             if (!isFacingRight) {
                 attackFrames[i].mirrorHorizontally();
             }
@@ -77,12 +86,21 @@ public class Player extends Character {
     private void loadJumpFrames() {
         jumpFrames = new GreenfootImage[5];
         for (int i = 0; i < jumpFrames.length; i++) {
-            jumpFrames[i] = new GreenfootImage("JUMP-" + i + ".png");
+            jumpFrames[i] = new GreenfootImage("PLAYER-JUMP-" + i + ".png");
             if (!isFacingRight) {
                 jumpFrames[i].mirrorHorizontally();
             }
         }
+    }
 
+    private void loadDeathFrames() {
+        deathFrames = new GreenfootImage[12];
+        for (int i = 0; i < deathFrames.length; i++) {
+            deathFrames[i] = new GreenfootImage("PLAYER-DEATH-" + i + ".png");
+            if (!isFacingRight) {
+                deathFrames[i].mirrorHorizontally();
+            }
+        }
     }
 
     /**
@@ -101,7 +119,7 @@ public class Player extends Character {
             }
 
         }
-        inputAction();
+        handleInput();
         applyGravity();
     }
 
@@ -113,7 +131,7 @@ public class Player extends Character {
         return isJumping && isAttacking;
     }
 
-    private void inputAction() {
+    private void handleInput() {
         int x = getX();
         int y = getY();
 
@@ -159,6 +177,7 @@ public class Player extends Character {
             setImage(frame);
             Greenfoot.delay(5);
         }
+        dealDamage(damage, width / 2 + weaponReach);
         isAttacking = false;
     }
 
@@ -179,6 +198,17 @@ public class Player extends Character {
         }
     }
 
+    public void removeHealth(int damage) {
+        health -= damage;
+        if (health <= 0) {
+            for (GreenfootImage frame : deathFrames) {
+                setImage(frame);
+                Greenfoot.delay(5);
+            }
+            getWorld().showText("Game Over", getWorld().getWidth() / 2, getWorld().getHeight() / 2);
+        }
+    }
+
     private void mirrorAllFrames() {
         for (GreenfootImage frame : idleFrames) {
             frame.mirrorHorizontally();
@@ -190,6 +220,9 @@ public class Player extends Character {
             frame.mirrorHorizontally();
         }
         for (GreenfootImage frame : attackFrames) {
+            frame.mirrorHorizontally();
+        }
+        for (GreenfootImage frame : deathFrames) {
             frame.mirrorHorizontally();
         }
 
