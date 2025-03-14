@@ -20,7 +20,7 @@ public class Player extends Character {
 
     // movement properties
     protected int speed = 2;
-    protected int jumpStrength = 10;
+    protected int jumpStrength = 11;
     protected int gravity = 1;
     protected int verticalSpeed = 0;
     protected boolean isJumping = false;
@@ -30,6 +30,8 @@ public class Player extends Character {
     protected GreenfootImage image;
     protected int height;
     protected int width;
+    protected int playerHorizontalEdge;
+    protected int playerVerticalEdge;
 
     // roleplay properties
     protected int health = 100;
@@ -51,7 +53,8 @@ public class Player extends Character {
         width = image.getWidth();
         height = image.getHeight();
         weaponReach = width / 2;
-
+        playerHorizontalEdge = width / 2;
+        playerVerticalEdge = height / 2;
         // Initialize health bar
         healthBar = new HealthBar(health, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
 
@@ -152,16 +155,18 @@ public class Player extends Character {
         int y = getY();
 
         if (Greenfoot.isKeyDown("left")) {
-
-            x -= speed;
+            if (!isPlatformOnLeft()) {
+                x -= speed;
+            }
             if (isFacingRight) {
                 mirrorAllFrames();
                 isFacingRight = false;
             }
-
         }
         if (Greenfoot.isKeyDown("right")) {
-            x += speed;
+            if (!isPlatformOnRight()) {
+                x += speed;
+            }
             if (!isFacingRight) {
                 mirrorAllFrames();
                 isFacingRight = true;
@@ -182,6 +187,24 @@ public class Player extends Character {
         setLocation(x, y);
     }
 
+    private boolean isOnTopOfPlatform() {
+        Actor actor = getOneObjectAtOffset(0, playerHorizontalEdge, Platform.class);
+        return actor != null;
+
+    }
+
+    private boolean isPlatformOnRight() {
+        Actor actor = getOneObjectAtOffset(playerVerticalEdge, 0, Platform.class);
+        return actor != null;
+
+    }
+
+    private boolean isPlatformOnLeft() {
+        Actor actor = getOneObjectAtOffset(-playerVerticalEdge, 0, Platform.class);
+        return actor != null;
+
+    }
+
     private void jump() {
         verticalSpeed = -jumpStrength;
         isJumping = true;
@@ -193,27 +216,31 @@ public class Player extends Character {
             setImage(frame);
             Greenfoot.delay(5);
         }
-        int playerReach = width / 2 + weaponReach;
+        int playerReach = playerVerticalEdge + weaponReach;
         int attackX = isFacingRight ? 0 + playerReach : 0 - playerReach;
         dealDamage(Player.class, damage, attackX);
         isAttacking = false;
     }
 
     private void applyGravity() {
-        if (isJumping) {
-            setLocation(getX(), getY() + verticalSpeed);
-            verticalSpeed += gravity;
+        setLocation(getX(), getY() + verticalSpeed);
+        verticalSpeed += gravity;
 
-            // Update the jump frame based on the vertical speed
+        // Update the jump frame based on the vertical speed if jumping
+        if (isJumping) {
             int jumpFrame = Math.min(Math.abs(verticalSpeed / 2), jumpFrames.length - 1);
             setImage(jumpFrames[jumpFrame]);
-
-            // Check if the player has landed
-            if (getY() >= getWorld().getHeight() - height / 2) {
-                isJumping = false;
-                verticalSpeed = 0;
-            }
         }
+
+        // Check if the player has landed
+        if (hasLanded()) {
+            isJumping = false;
+            verticalSpeed = 0;
+        }
+    }
+
+    private boolean hasLanded() {
+        return (getY() >= getWorld().getHeight() - playerVerticalEdge || isTouching(Platform.class));
     }
 
     public void removeHealth(int damage) {
