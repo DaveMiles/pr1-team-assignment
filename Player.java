@@ -36,13 +36,25 @@ public class Player extends Character {
     protected int damage = 50;
     protected int weaponReach;
 
+    // health bar properties
+    private HealthBar healthBar;
+    private boolean healthBarVisible = false;
+    private int HEALTH_BAR_X = 80;
+    private int HEALTH_BAR_Y = 25;
+    private int HEALTH_BAR_WIDTH = 150;
+    private int HEALTH_BAR_HEIGHT = 12;
+
     public Player() {
         loadPlayerFrames();
-        image = new GreenfootImage("PLAYER-IDLE-0.png");
+        image = new GreenfootImage(idleFrames[0]);
         setImage(image);
         width = image.getWidth();
         height = image.getHeight();
         weaponReach = width / 2;
+
+        // Initialize health bar
+        healthBar = new HealthBar(health, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+
     }
 
     private void loadPlayerFrames() {
@@ -108,6 +120,10 @@ public class Player extends Character {
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
     public void act() {
+        if (!healthBarVisible) {
+            getWorld().addObject(healthBar, HEALTH_BAR_X, HEALTH_BAR_Y);
+            healthBarVisible = true;
+        }
         if (!isInAction()) {
             GreenfootImage[] currentFrames = isMoving() ? runFrames : idleFrames;
             if (frameDelay >= delayCount) {
@@ -177,7 +193,9 @@ public class Player extends Character {
             setImage(frame);
             Greenfoot.delay(5);
         }
-        dealDamage(Player.class, damage, width / 2 + weaponReach);
+        int playerReach = width / 2 + weaponReach;
+        int attackX = isFacingRight ? 0 + playerReach : 0 - playerReach;
+        dealDamage(Player.class, damage, attackX);
         isAttacking = false;
     }
 
@@ -200,6 +218,7 @@ public class Player extends Character {
 
     public void removeHealth(int damage) {
         health -= damage;
+        healthBar.setHealth(health);
         if (health <= 0) {
             for (GreenfootImage frame : deathFrames) {
                 setImage(frame);
