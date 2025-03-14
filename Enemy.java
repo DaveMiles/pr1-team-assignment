@@ -26,8 +26,8 @@ public class Enemy extends Character
     // role play properties
     protected int health = 100;
     protected int damage = 10;
-    // protected int attacksPerSecond = 1;
     private int attackDelay = 30;
+    private int attackCounter = 0;
 
     public Enemy() {
         loadFrames();
@@ -89,6 +89,11 @@ public class Enemy extends Character
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
     public void act() {
+        attackCounter++;
+        if (attackCounter >= attackDelay) {
+            attack();
+            attackCounter = 0;
+        }
         if (frameDelay >= delayCount) {
             setImage(idleFrames[currentFrame]);
             currentFrame = (currentFrame + 1) % idleFrames.length;
@@ -96,11 +101,11 @@ public class Enemy extends Character
         } else {
             frameDelay++;
         }
-        attack();
+
     }
 
     private void attack() {
-        dealDamage(damage, width);
+        dealDamage(Enemy.class, damage, 0);
     }
 
     public void removeHealth(int damage) {

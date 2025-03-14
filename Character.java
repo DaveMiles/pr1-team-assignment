@@ -20,15 +20,30 @@ public class Character extends Actor {
         // Add your action code here.
     }
 
-    public void dealDamage(int damage, int reach) {
-        Actor actor = getOneObjectAtOffset(reach, 0, null);
-        if (actor instanceof Enemy) {
-            Enemy enemy = (Enemy) actor;
-            enemy.removeHealth(damage);
-        } else if (actor instanceof Player) {
-            Player player = (Player) actor;
-            player.removeHealth(damage);
+    public void dealDamage(Class whoAmI, int damage, int reach) {
+        Actor actor = null;
+        switch (whoAmI.getName()) {
+            case "Player":
+                // player will deal damage in the direction they are facing + the reach of the
+                // sword
+                actor = getOneObjectAtOffset(reach, 0, null);
+                if (actor instanceof Enemy) {
+                    Enemy enemy = (Enemy) actor;
+                    enemy.removeHealth(damage);
+                }
+                break;
+            case "Enemy":
+                // enemy will deal damage to the player if they are touching
+                actor = getOneIntersectingObject(null);
+                if (actor instanceof Player) {
+                    Player player = (Player) actor;
+                    player.removeHealth(damage);
+                }
+                break;
+            default:
+                break;
         }
+
     }
 
 }

@@ -177,7 +177,7 @@ public class Player extends Character {
             setImage(frame);
             Greenfoot.delay(5);
         }
-        dealDamage(damage, width / 2 + weaponReach);
+        dealDamage(Player.class, damage, width / 2 + weaponReach);
         isAttacking = false;
     }
 
@@ -205,7 +205,9 @@ public class Player extends Character {
                 setImage(frame);
                 Greenfoot.delay(5);
             }
-            getWorld().showText("Game Over", getWorld().getWidth() / 2, getWorld().getHeight() / 2);
+            getWorld().showText("Game Over, reset to play again.", getWorld().getWidth() / 2,
+                    getWorld().getHeight() / 2);
+            Greenfoot.stop();
         }
     }
 
