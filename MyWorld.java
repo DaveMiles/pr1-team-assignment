@@ -25,8 +25,11 @@ public class MyWorld extends World {
             { 100, WORLD_HEIGHT - enemy_height / 2 }, { 600, WORLD_HEIGHT - enemy_height / 2 }
     };
 
+    int[][] potionPositions = {
+            { 360, 405 }
+    };
+
     public MyWorld() {
-        // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
         super(WORLD_WIDTH, WORLD_HEIGHT, WORLD_PIXEL);
         GreenfootImage background = new GreenfootImage("DARK-CASTLE2.jpg");
         setBackground(background);
@@ -37,27 +40,32 @@ public class MyWorld extends World {
         addObject(water, 360, 560);
         addPlatforms();
         addEnemies();
-
-        Potion potion = new Potion();
-        addObject(potion, 100, 520);
+        addPotions();
     }
 
     public void addPlatforms() {
-        // Loop through the array and add platforms at each position
         for (int i = 0; i < platformPositions.length; i++) {
             int x = platformPositions[i][0];
             int y = platformPositions[i][1];
-            Platform platform = new Platform(); // Assuming you have a Platform class
+            Platform platform = new Platform();
             addObject(platform, x, y);
         }
     }
 
+    public void addPotions() {
+        for (int i = 0; i < potionPositions.length; i++) {
+            int x = potionPositions[i][0];
+            int y = potionPositions[i][1];
+            Potion potion = new Potion();
+            addObject(potion, x, y);
+        }
+    }
+
     public void addEnemies() {
-        // Loop through the array and add platforms at each position
         for (int i = 0; i < enemyPositions.length; i++) {
             int x = enemyPositions[i][0];
             int y = enemyPositions[i][1];
-            Enemy enemy = new Enemy(); // Assuming you have a Platform class
+            Enemy enemy = new Enemy();
             addObject(enemy, x, y);
         }
 
