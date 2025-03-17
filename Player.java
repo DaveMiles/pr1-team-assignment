@@ -34,7 +34,8 @@ public class Player extends Character {
     protected int playerVerticalEdge;
 
     // roleplay properties
-    protected int health = 100;
+    protected int totalHealth = 100;
+    protected int currentHealth = 100;
     protected int damage = 50;
     protected int weaponReach;
 
@@ -56,7 +57,7 @@ public class Player extends Character {
         playerHorizontalEdge = width / 2;
         playerVerticalEdge = height / 2;
         // Initialize health bar
-        healthBar = new HealthBar(health, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+        healthBar = new HealthBar(totalHealth, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
 
     }
 
@@ -183,6 +184,13 @@ public class Player extends Character {
                 attack();
             }
         }
+        if (Greenfoot.isKeyDown("f")) {
+            Actor actor = getOneObjectAtOffset(0, 0, null);
+            if (actor instanceof Potion) {
+                Potion potion = (Potion) actor;
+                addHealth(potion.use());
+            }
+        }
 
         setLocation(x, y);
     }
@@ -244,17 +252,27 @@ public class Player extends Character {
     }
 
     public void removeHealth(int damage) {
-        health -= damage;
-        healthBar.setHealth(health);
-        if (health <= 0) {
-            for (GreenfootImage frame : deathFrames) {
-                setImage(frame);
-                Greenfoot.delay(5);
-            }
-            getWorld().showText("Game Over, reset to play again.", getWorld().getWidth() / 2,
-                    getWorld().getHeight() / 2);
-            Greenfoot.stop();
+        currentHealth -= damage;
+        healthBar.setHealth(currentHealth);
+        if (currentHealth <= 0) {
+            die();
         }
+    }
+
+    public void addHealth(int healAmount) {
+        currentHealth += healAmount;
+        if (currentHealth > totalHealth) {
+            currentHealth = totalHealth;
+        }
+        healthBar.setHealth(currentHealth);
+    }
+
+    private void die() {
+        for (GreenfootImage frame : deathFrames) {
+            setImage(frame);
+            Greenfoot.delay(5);
+        }
+        getWorld().removeObject(this);
     }
 
     private void mirrorAllFrames() {
