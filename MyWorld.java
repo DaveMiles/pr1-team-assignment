@@ -7,7 +7,7 @@ import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
  * @version (a version number or a date)
  */
 public class MyWorld extends World {
-    final static int WORLD_WIDTH = 1900;
+    final static int WORLD_WIDTH = 1350;
     final static int WORLD_HEIGHT = 540;
     final static int WORLD_PIXEL = 1;
     final static int enemy_height = 28;
@@ -35,6 +35,8 @@ public class MyWorld extends World {
         setBackground(background);
         Player player = new Player();
         addObject(player, 20, WORLD_HEIGHT - player.height / 2);
+        WinFlag flag = new WinFlag();
+        addObject(flag, 1100, 510);
 
         Water water = new Water(120, 40);
         addObject(water, 360, 560);
