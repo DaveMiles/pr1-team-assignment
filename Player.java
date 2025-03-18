@@ -141,6 +141,18 @@ public class Player extends Character {
         }
         handleInput();
         applyGravity();
+        checkForFlagInteraction();
+    }
+    
+    private void checkForFlagInteraction() {
+        // Check if player is touching a WinFlag object
+        Actor flag = getOneObjectAtOffset(0, 0, WinFlag.class);
+        
+        if (flag != null && Greenfoot.isKeyDown("f")) {
+            // If player is near the flag and presses 'F', trigger the flag to win
+            WinFlag winFlag = (WinFlag) flag;  // Cast the actor to WinFlag
+            winFlag.hasWon = true;  // Set the hasWon variable to true
+        }
     }
 
     private boolean isMoving() {
