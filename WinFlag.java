@@ -7,7 +7,7 @@ public class WinFlag extends Actor {
     private int currentFrame = 0;     // Index to keep track of the current frame
     private int frameDelay = 0;       // Counter to track delay before switching frames
     private int delayCount = 10;      // How long to wait before switching to the next frame
-    protected boolean hasWon = false; // To determine if the flag has won
+    public boolean hasWon = false; // To determine if the flag has won
 
     public WinFlag() {
         loadFlagFrames();  // Load both waving and winning flag frames
@@ -39,16 +39,14 @@ public class WinFlag extends Actor {
 
         // Update the flag animation based on frameDelay and delayCount
         if (frameDelay >= delayCount) {
-            // Update the image to the current frame
+
             setImage(currentFrames[currentFrame]);
 
-            // Increment the frame, looping back to 0 if necessary
+
             currentFrame = (currentFrame + 1) % currentFrames.length;
 
-            // Reset frameDelay to 0
             frameDelay = 0;
         } else {
-            // Increment frameDelay until it reaches delayCount
             frameDelay++;
         }
     }
