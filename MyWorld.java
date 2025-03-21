@@ -12,6 +12,8 @@ public class MyWorld extends World {
     final static int WORLD_PIXEL = 1;
     final static int enemy_height = 28;
     private GreenfootImage background;
+    private boolean hasWon = false;
+    private Message congratulationsMessage;
 
     int[][] platformPositions = {
             { 200, 520 }, { 240, 520 }, { 280, 520 }, { 240, 480 }, { 280, 480 }, { 280, 440 },
@@ -19,14 +21,14 @@ public class MyWorld extends World {
             { 480, 520 }, { 520, 520 }, { 600, 480 }, { 640, 480 }, { 680, 480 }, { 760, 440 },
             { 800, 440 }, { 880, 480 }, { 960, 440 }, {1040, 480 }, {1080, 480 }, {1160, 480 },
             {1240, 440 }, {1320, 400 }, {1240, 320 }, {1200, 320 }, {1160, 320 }, {1080, 320 },
-            {1040, 280 }, { 960, 240 }, { 840, 280 }, { 880, 280 }, { 800, 280 }, { 680, 320 },
-            { 680, 280 }, { 640, 280 }, { 640, 240 }, { 520, 280 }, { 440, 280 }, { 360, 280 }, 
+            {1040, 280 }, { 960, 240 }, { 840, 280 }, { 880, 280 }, { 800, 280 }, { 720, 280 },
+            { 680, 280 }, { 640, 280 }, { 600, 280 }, { 520, 280 }, { 440, 280 }, { 360, 280 }, 
             { 280, 280 }, { 200, 320 }, { 120, 280 }, { 80, 280  }, { 40, 240  }, { 120, 160 }, 
             { 200, 80  }, { 240, 80  }, { 280, 80  }, { 360, 80  }, { 400, 120 }, { 480, 120 },
             { 520, 80  }, { 600, 80  }, { 640, 80  }, { 720, 80  }, { 800, 80  }, { 840, 80  },
             { 920, 80  }, { 960, 80  }, { 1040, 120}, { 1320, 80 }, { 1280, 80 }, { 1240, 80 },
             { 1200, 80 }, { 1160, 80}
-    };
+        };
     // Add as many as needed to the coords
 
     int[][] enemyPositions = {
@@ -36,12 +38,12 @@ public class MyWorld extends World {
             { 240, (WORLD_HEIGHT - enemy_height / 2) - 480 }, { 720, (WORLD_HEIGHT - enemy_height / 2) - 480  },
             { 840, (WORLD_HEIGHT - enemy_height / 2) - 480 }, { 960, (WORLD_HEIGHT - enemy_height / 2) - 480  },
             { 1040, (WORLD_HEIGHT - enemy_height / 2) - 440}, { 1200, (WORLD_HEIGHT - enemy_height / 2) - 480 },
-            { 40, (WORLD_HEIGHT - enemy_height / 2) - 320 },
-    };
+            { 40, (WORLD_HEIGHT - enemy_height / 2) - 320 }, { 640, (WORLD_HEIGHT - enemy_height / 2) - 280 },
+        };
 
     int[][] potionPositions = {
             { 760, 405 }, { 960, 200 }, { 640, 40 },
-    };
+        };
 
     public MyWorld() {
         super(WORLD_WIDTH, WORLD_HEIGHT, WORLD_PIXEL);
@@ -85,5 +87,45 @@ public class MyWorld extends World {
             addObject(enemy, x, y);
         }
 
+    }
+
+    public void act()
+    {
+        if (hasWon) {
+            showCongratulations();
+        }
+
+        checkWinCondition();
+    }
+
+    private void checkWinCondition() {
+        Player player = (Player) getObjects(Player.class).get(0);  
+        WinFlag flag = (WinFlag) getObjects(WinFlag.class).get(0); 
+
+        if (player != null && flag != null) {
+
+            int playerX = player.getX();
+            int playerY = player.getY();
+            int playerWidth = player.getImage().getWidth();
+            int playerHeight = player.getImage().getHeight();
+
+            int flagX = flag.getX();
+            int flagY = flag.getY();
+            int flagWidth = flag.getImage().getWidth();
+            int flagHeight = flag.getImage().getHeight();
+
+            if (playerX + playerWidth > flagX && playerX < flagX + flagWidth &&
+                playerY + playerHeight > flagY && playerY < flagY + flagHeight) {
+                hasWon = true;  
+                flag.hasWon = true;  
+            }
+        }
+    }
+
+    private void showCongratulations() {
+        if (congratulationsMessage == null) {
+            congratulationsMessage = new Message("Congratulations! Press restart to play again.");
+            addObject(congratulationsMessage, WORLD_WIDTH / 2, WORLD_HEIGHT / 2); 
+        }
     }
 }
